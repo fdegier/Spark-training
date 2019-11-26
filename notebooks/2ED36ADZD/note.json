@@ -1,0 +1,1362 @@
+{
+  "paragraphs": [
+    {
+      "text": "%md\n## Pyspark 101: data prep\n---\n  \nIn dit notebook gaan we in op de basis van Zeppelin en de basis functionaliteit om data in te lezen en te bewerken met PySpark en SparkSQL, als laatste schrijven we het resultaat weg naar Hive.  \n  \nAl deze bewerkingen doen we aan de hand van de Kaggle Titanic dataset, de set is natuurlijk erg klein voor Spark maar de set is herkenbaar en aangezien we lokaal draaien hoeven we niet te lang te wachten.\n\nDe dataset is beschikbaar in de container op de volgende locatie:\n\nParquet format:\n`/zeppelin/data/titanic_dataset.parquet`\n\nCSV format:\n`/zeppelin/data/titanic_dataset.csv`",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:07:40.579",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionSupport": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "results": {},
+        "enabled": true,
+        "fontSize": 9.0
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003ePyspark 101: data prep\u003c/h2\u003e\n\u003chr/\u003e\n\u003cp\u003eIn dit notebook gaan we in op de basis van Zeppelin en de basis functionaliteit om data in te lezen en te bewerken met PySpark en SparkSQL, als laatste schrijven we het resultaat weg naar Hive. \u003c/p\u003e\n\u003cp\u003eAl deze bewerkingen doen we aan de hand van de Kaggle Titanic dataset, de set is natuurlijk erg klein voor Spark maar de set is herkenbaar en aangezien we lokaal draaien hoeven we niet te lang te wachten.\u003c/p\u003e\n\u003cp\u003eDe dataset is beschikbaar in de container op de volgende locatie:\u003c/p\u003e\n\u003cp\u003eParquet format:\u003cbr/\u003e\u003ccode\u003e/zeppelin/data/titanic_dataset.parquet\u003c/code\u003e\u003c/p\u003e\n\u003cp\u003eCSV format:\u003cbr/\u003e\u003ccode\u003e/zeppelin/data/titanic_dataset.csv\u003c/code\u003e\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1557511662071_1000871771",
+      "id": "20190507-102155_235289786",
+      "dateCreated": "2019-05-10 18:07:42.000",
+      "dateStarted": "2019-11-25 21:07:40.580",
+      "dateFinished": "2019-11-25 21:07:40.592",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n# Data inladen\nWe hebben data klaarstaan en weten wat de locatie is, nu kunnen we het in gaan laden in Spark. Hiervoor zijn verschillende methode afhankelijk van het soort bestand en voorkeursmethode.\n\nAangezien het een Parquet en CSV bestand zijn kunnen we het direct inlezen in een DataFrame, sommige platte tekst bestanden moet je eerst in een RDD laden en vervolgens omzetten naar een DataFrame. Voor het gemak focussen we in deze training op DataFrames en op het inladen en halen we kort aan hoe je dit doet voor een RDD.\n\n\nWe beginnen met Spark SQL, hiermee is het mogelijk om met SQL syntax allerlei bewerkingen uit te voeren op de data. Dit kan vooral handig zijn bij ad-hoc analyse en met name bij data die bijvoorbeeld in Hive staat.\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:07:43.869",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionSupport": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "results": {},
+        "enabled": true,
+        "fontSize": 9.0
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch1\u003eData inladen\u003c/h1\u003e\n\u003cp\u003eWe hebben data klaarstaan en weten wat de locatie is, nu kunnen we het in gaan laden in Spark. Hiervoor zijn verschillende methode afhankelijk van het soort bestand en voorkeursmethode.\u003c/p\u003e\n\u003cp\u003eAangezien het een Parquet en CSV bestand zijn kunnen we het direct inlezen in een DataFrame, sommige platte tekst bestanden moet je eerst in een RDD laden en vervolgens omzetten naar een DataFrame. Voor het gemak focussen we in deze training op DataFrames en op het inladen en halen we kort aan hoe je dit doet voor een RDD.\u003c/p\u003e\n\u003cp\u003eWe beginnen met Spark SQL, hiermee is het mogelijk om met SQL syntax allerlei bewerkingen uit te voeren op de data. Dit kan vooral handig zijn bij ad-hoc analyse en met name bij data die bijvoorbeeld in Hive staat.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1557511662075_-1352999777",
+      "id": "20190507-141608_1854803033",
+      "dateCreated": "2019-05-10 18:07:42.000",
+      "dateStarted": "2019-11-25 21:07:43.869",
+      "dateFinished": "2019-11-25 21:07:43.880",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\r\nselect * from parquet.`./data/titanic_dataset.parquet` limit 10",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 19:25:37.813",
+      "config": {
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "PassengerId": "string",
+                      "Survived": "string",
+                      "Pclass": "string",
+                      "Name": "string",
+                      "Sex": "string",
+                      "Age": "string",
+                      "SibSp": "string",
+                      "Parch": "string",
+                      "Ticket": "string",
+                      "Fare": "string",
+                      "Cabin": "string",
+                      "Embarked": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "stackedAreaChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "PassengerId",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "Survived",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true,
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "fontSize": 9.0
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1557511662075_-1672154335",
+      "id": "20190507-105028_1546816728",
+      "dateCreated": "2019-05-10 18:07:42.000",
+      "dateStarted": "2019-11-25 19:22:06.236",
+      "dateFinished": "2019-11-25 19:22:06.475",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\nSELECT Sex, CAST(AVG(Age) AS INT) as avg_age FROM parquet.`./data/titanic_dataset.parquet` GROUP BY 1",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 19:25:01.469",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "Sex": "string",
+                      "avg_age": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "stackedAreaChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                },
+                "lineChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "Sex",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "avg_age",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1574709671084_1660647435",
+      "id": "20191125-192111_577019102",
+      "dateCreated": "2019-11-25 19:21:11.084",
+      "dateStarted": "2019-11-25 19:23:36.668",
+      "dateFinished": "2019-11-25 19:23:37.412",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n### Opdracht\nMaak een verdeling van de leeftijd, optioneel ook een staafdiagram\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:07:47.488",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003eOpdracht\u003c/h3\u003e\n\u003cp\u003eMaak een verdeling van de leeftijd, optioneel ook een staafdiagram\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1574709946519_47955572",
+      "id": "20191125-192546_35564744",
+      "dateCreated": "2019-11-25 19:25:46.519",
+      "dateStarted": "2019-11-25 21:07:47.488",
+      "dateFinished": "2019-11-25 21:07:47.500",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 19:33:05.347",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1574710381721_-567041717",
+      "id": "20191125-193301_762708932",
+      "dateCreated": "2019-11-25 19:33:01.721",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n### Inladen met PySpark\nSparkSQL heeft als voordeel dat het voor vrijwel iedereen erg makkelijk is. Het is alleen ook wel weer gelimiteerd als we wat geavanceerdere operaties willen uitvoeren. Daarom gebruiken we vaker\nPySpark, overigens kan in je PySpark ook SQL commandos uitvoeren. Laten we beginnen met hetzelfde Parquet bestand in te lezen in een PySpark DataFrame.",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 19:37:36.750",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": false,
+        "tableHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1557567818407_-196126367",
+      "id": "20190511-094338_1789036534",
+      "dateCreated": "2019-05-11 09:43:38.000",
+      "dateStarted": "2019-11-25 19:35:21.612",
+      "dateFinished": "2019-11-25 19:35:21.628",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%pyspark\ndf \u003d spark.read.parquet(\"./data/titanic_dataset.parquet\").limit(10)",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 19:38:22.830",
+      "config": {
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/python",
+        "results": {},
+        "enabled": true,
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "fontSize": 9.0
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://38f1a360e020:4040/jobs/job?id\u003d56"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1557511662076_1246276319",
+      "id": "20190507-114803_44720267",
+      "dateCreated": "2019-05-10 18:07:42.000",
+      "dateStarted": "2019-11-25 19:38:22.859",
+      "dateFinished": "2019-11-25 19:38:22.996",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n### Zeppelin magic\nZeppelin laat bij SparkSQL direct een mooie interface zien om grafieken te maken, maar zoals je ziet gebeurde dat niet bij een `spark.read` maar dat kan wel.\n  \nOm dit aan te roepen gebruik je de variabel `z`, er is veel mogelijk maar we houden het simpel. Om een PySpark dataframe te visualiseren gebruik je het volgende commando:\n```\n%pyspark\nz.show(df)\n```\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:07:51.196",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003eZeppelin magic\u003c/h3\u003e\n\u003cp\u003eZeppelin laat bij SparkSQL direct een mooie interface zien om grafieken te maken, maar zoals je ziet gebeurde dat niet bij een \u003ccode\u003espark.read\u003c/code\u003e maar dat kan wel.\u003c/p\u003e\n\u003cp\u003eOm dit aan te roepen gebruik je de variabel \u003ccode\u003ez\u003c/code\u003e, er is veel mogelijk maar we houden het simpel. Om een PySpark dataframe te visualiseren gebruik je het volgende commando:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e%pyspark\nz.show(df)\n\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1557570722076_-1079228848",
+      "id": "20190511-103202_1836896153",
+      "dateCreated": "2019-05-11 10:32:02.000",
+      "dateStarted": "2019-11-25 21:07:51.196",
+      "dateFinished": "2019-11-25 21:07:51.209",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%pyspark\nz.show(df)",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 19:38:27.115",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "PassengerId": "string",
+                      "Survived": "string",
+                      "Pclass": "string",
+                      "Name": "string",
+                      "Sex": "string",
+                      "Age": "string",
+                      "SibSp": "string",
+                      "Parch": "string",
+                      "Ticket": "string",
+                      "Fare": "string",
+                      "Cabin": "string",
+                      "Embarked": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1557570929254_-27892507",
+      "id": "20190511-103529_1821760474",
+      "dateCreated": "2019-05-11 10:35:29.000",
+      "dateStarted": "2019-11-25 19:38:27.140",
+      "dateFinished": "2019-11-25 19:38:27.245",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n### CSV inladen\nJe kan ook CSV gebruiken, het ligt er vooral aan wat voor data het is en hoe die beschikbaar is gesteld. Bij voorkeur gebruik je Parquet of ORC tenzij het zeer beperkte data is en je alle kolommen gaat gebruiken. Bij het inlezen van CSV bestanden zijn de argumenten voor het grootste gedeelte gelijk aan dia van Pandas.",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:07:54.068",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003eCSV inladen\u003c/h3\u003e\n\u003cp\u003eJe kan ook CSV gebruiken, het ligt er vooral aan wat voor data het is en hoe die beschikbaar is gesteld. Bij voorkeur gebruik je Parquet of ORC tenzij het zeer beperkte data is en je alle kolommen gaat gebruiken. Bij het inlezen van CSV bestanden zijn de argumenten voor het grootste gedeelte gelijk aan dia van Pandas.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1557568892912_276579099",
+      "id": "20190511-100132_404499671",
+      "dateCreated": "2019-05-11 10:01:32.000",
+      "dateStarted": "2019-11-25 21:07:54.068",
+      "dateFinished": "2019-11-25 21:07:54.081",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%pyspark\ndf_csv \u003d spark.read.csv(\"/zeppelin/data/titanic_dataset.csv\", sep\u003d\";\", header\u003dTrue, inferSchema\u003dTrue)",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 20:11:55.250",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://38f1a360e020:4040/jobs/job?id\u003d60",
+            "http://38f1a360e020:4040/jobs/job?id\u003d61"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1557568778281_-787857898",
+      "id": "20190511-095938_875413378",
+      "dateCreated": "2019-05-11 09:59:38.000",
+      "dateStarted": "2019-11-25 19:42:27.671",
+      "dateFinished": "2019-11-25 19:42:27.947",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n### DataFrame inspecteren\nZodra je data hebt ingeladen wil je natuurlijk weten wat er in zit, hieronder een aantal van de belangrijkste functies:\n  \n#### Eerst n regels (head)\nStandaard krijg je 20 regels, als je data breder is dat x aantal karakters zal Spark dit truncaten\n```\n[In]: df.show(n\u003d20, truncate\u003dFalse)\n```\n  \n#### Kolommen weergeven\n```\n[In]: df.colums\n[Out]: [\u0027col_a\u0027, \u0027col_b\u0027]\n```\n#### Schema inzien\nIn de basis:\n```\n[In]: df.schema\n[Out]: StructType(List(StructField(a,LongType,true)))\n\n```\n\nMaar veel beter:\n```\n[In]: df.printSchema()\n[Out]: \nroot\n |-- a: long (nullable \u003d true)\n```\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:07:57.793",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003eDataFrame inspecteren\u003c/h3\u003e\n\u003cp\u003eZodra je data hebt ingeladen wil je natuurlijk weten wat er in zit, hieronder een aantal van de belangrijkste functies:\u003c/p\u003e\n\u003ch4\u003eEerst n regels (head)\u003c/h4\u003e\n\u003cp\u003eStandaard krijg je 20 regels, als je data breder is dat x aantal karakters zal Spark dit truncaten\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e[In]: df.show(n\u003d20, truncate\u003dFalse)\n\u003c/code\u003e\u003c/pre\u003e\n\u003ch4\u003eKolommen weergeven\u003c/h4\u003e\n\u003cpre\u003e\u003ccode\u003e[In]: df.colums\n[Out]: [\u0026#39;col_a\u0026#39;, \u0026#39;col_b\u0026#39;]\n\u003c/code\u003e\u003c/pre\u003e\n\u003ch4\u003eSchema inzien\u003c/h4\u003e\n\u003cp\u003eIn de basis:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e[In]: df.schema\n[Out]: StructType(List(StructField(a,LongType,true)))\n\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eMaar veel beter:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e[In]: df.printSchema()\n[Out]: \nroot\n |-- a: long (nullable \u003d true)\n\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1557570334892_345293426",
+      "id": "20190511-102534_786489139",
+      "dateCreated": "2019-05-11 10:25:34.000",
+      "dateStarted": "2019-11-25 21:07:57.794",
+      "dateFinished": "2019-11-25 21:07:57.781",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n### Opdracht\nPrint het schema en de eerste 10 regels, kijk wat het verschil is wanneer je wel of niet truncate.",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:08:01.999",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003eOpdracht\u003c/h3\u003e\n\u003cp\u003ePrint het schema en de eerste 10 regels, kijk wat het verschil is wanneer je wel of niet truncate.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1574710962023_-517201983",
+      "id": "20191125-194242_230975962",
+      "dateCreated": "2019-11-25 19:42:42.023",
+      "dateStarted": "2019-11-25 21:08:01.999",
+      "dateFinished": "2019-11-25 21:08:02.004",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%pyspark\n\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 20:08:15.801",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1574712335287_-1476704313",
+      "id": "20191125-200535_1638924850",
+      "dateCreated": "2019-11-25 20:05:35.287",
+      "dateStarted": "2019-11-25 20:06:18.796",
+      "dateFinished": "2019-11-25 20:06:18.925",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n### Basis operaties\nNaast de methodes die direct toepasbaar zijn op een DataFrame zijn er ook de `pyspark.sql.functions` meestal worden die als geheel met een alias geimporteerd.\n\nEen overzicht met alle functies is te vinden in de [documentatie](https://spark.apache.org/docs/2.4.4/api/python/pyspark.sql.html), maak hier zo veel mogelijk gebruik van aangezien deze functies volledig geoptimaliseerd zijn om het cluster te gebruiken.\n\n```\nimport pyspark.sql.functions as F\n```\n\n#### Filteren\n```python\ndf \u003d df.filter(F.col(\u0027Age\u0027) \u003e\u003d 18)\n```\n\n#### Kolom hernoemen\n```python\ndf \u003d df.withColumnRenamed(existing\u003d\u0027Survived\u0027, new\u003d\u0027label\u0027)\n```\n\n#### Bewerking op kolom\n```python\ndf \u003d df.withColumn(colName\u003d\"family\", F.when(F.col(\u0027SibSp\u0027) \u003e 1, 1).otherwise(0)))\n\n# Another DataFrame\na \u003d a.withColumn(\u0027fullName\u0027, F.concat(F.col(\u0027firstName\u0027), F.col(\u0027lastName\u0027)))\n```\n\n#### Datatype omzetten (cast)\n```python\ndf.withColumn(\u0027age\u0027, F.col(\"Age\").cast(\"string\"))\n```\n\n#### GroupBy\n```python\ndf.select(\u0027Pclass\u0027).groupBy().count().show()\n```\n\n#### Joining\n```python\njoined_df \u003d df.join(harbors, df.col1 \u003d\u003d habors.col6, \u0027inner\u0027)\n\njoined_df \u003d df.join(harbors, (df.col1 \u003d\u003d habors.col6) \u0026 (df.col1 \u003d\u003d harbors.col4), \u0027inner\u0027)\n\njoined_df \u003d df.join(harbors, (df.col1 \u003d\u003d habors.col6) | (df.col2 \u003d\u003d harbors.col3), \u0027inner\u0027)\n```\n\n#### Union\n```python\nunion_df \u003d df.union(df2)\n```\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:08:11.311",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003eBasis operaties\u003c/h3\u003e\n\u003cp\u003eNaast de methodes die direct toepasbaar zijn op een DataFrame zijn er ook de \u003ccode\u003epyspark.sql.functions\u003c/code\u003e meestal worden die als geheel met een alias geimporteerd.\u003c/p\u003e\n\u003cp\u003eEen overzicht met alle functies is te vinden in de \u003ca href\u003d\"https://spark.apache.org/docs/2.4.4/api/python/pyspark.sql.html\"\u003edocumentatie\u003c/a\u003e, maak hier zo veel mogelijk gebruik van aangezien deze functies volledig geoptimaliseerd zijn om het cluster te gebruiken.\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003eimport pyspark.sql.functions as F\n\u003c/code\u003e\u003c/pre\u003e\n\u003ch4\u003eFilteren\u003c/h4\u003e\n\u003cpre\u003e\u003ccode class\u003d\"python\"\u003edf \u003d df.filter(F.col(\u0026#39;Age\u0026#39;) \u0026gt;\u003d 18)\n\u003c/code\u003e\u003c/pre\u003e\n\u003ch4\u003eKolom hernoemen\u003c/h4\u003e\n\u003cpre\u003e\u003ccode class\u003d\"python\"\u003edf \u003d df.withColumnRenamed(existing\u003d\u0026#39;Survived\u0026#39;, new\u003d\u0026#39;label\u0026#39;)\n\u003c/code\u003e\u003c/pre\u003e\n\u003ch4\u003eBewerking op kolom\u003c/h4\u003e\n\u003cpre\u003e\u003ccode class\u003d\"python\"\u003edf \u003d df.withColumn(colName\u003d\u0026quot;family\u0026quot;, F.when(F.col(\u0026#39;SibSp\u0026#39;) \u0026gt; 1, 1).otherwise(0)))\n\n# Another DataFrame\na \u003d a.withColumn(\u0026#39;fullName\u0026#39;, F.concat(F.col(\u0026#39;firstName\u0026#39;), F.col(\u0026#39;lastName\u0026#39;)))\n\u003c/code\u003e\u003c/pre\u003e\n\u003ch4\u003eDatatype omzetten (cast)\u003c/h4\u003e\n\u003cpre\u003e\u003ccode class\u003d\"python\"\u003edf.withColumn(\u0026#39;age\u0026#39;, F.col(\u0026quot;Age\u0026quot;).cast(\u0026quot;string\u0026quot;))\n\u003c/code\u003e\u003c/pre\u003e\n\u003ch4\u003eGroupBy\u003c/h4\u003e\n\u003cpre\u003e\u003ccode class\u003d\"python\"\u003edf.select(\u0026#39;Pclass\u0026#39;).groupBy().count().show()\n\u003c/code\u003e\u003c/pre\u003e\n\u003ch4\u003eJoining\u003c/h4\u003e\n\u003cpre\u003e\u003ccode class\u003d\"python\"\u003ejoined_df \u003d df.join(harbors, df.col1 \u003d\u003d habors.col6, \u0026#39;inner\u0026#39;)\n\njoined_df \u003d df.join(harbors, (df.col1 \u003d\u003d habors.col6) \u0026amp; (df.col1 \u003d\u003d harbors.col4), \u0026#39;inner\u0026#39;)\n\njoined_df \u003d df.join(harbors, (df.col1 \u003d\u003d habors.col6) | (df.col2 \u003d\u003d harbors.col3), \u0026#39;inner\u0026#39;)\n\u003c/code\u003e\u003c/pre\u003e\n\u003ch4\u003eUnion\u003c/h4\u003e\n\u003cpre\u003e\u003ccode class\u003d\"python\"\u003eunion_df \u003d df.union(df2)\n\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1557570003556_1413421305",
+      "id": "20190511-102003_1374878474",
+      "dateCreated": "2019-05-11 10:20:03.000",
+      "dateStarted": "2019-11-25 21:08:11.311",
+      "dateFinished": "2019-11-25 21:08:11.326",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Opdracht: Van hoeveel mensen weten we de leeftijd niet?",
+      "text": "%pyspark\n# Assign your answer to \u0027age_nas\u0027\n\nage_nas \u003d 0\n\ntry:\n    assert age_nas \u003d\u003d 263\n    print(\"Correct answer\")\nexcept AssertionError:\n    print(\"Oops wrong answer\")",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 20:22:29.015",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1557577483308_-1492932778",
+      "id": "20190511-122443_700361485",
+      "dateCreated": "2019-05-11 12:24:43.000",
+      "dateStarted": "2019-11-25 20:14:43.809",
+      "dateFinished": "2019-11-25 20:14:44.082",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Opdracht: Hoeveel mannen en vrouwen waren er aan boord?",
+      "text": "%pyspark\n# Write your code to get the number of men and women on board\n\n\n\n\n# Assign the answers to below variables as integers\nmen \u003d 0\nwomen \u003d 0\n\ntry:\n    assert men \u003d\u003d 843\n    assert women \u003d\u003d 466\n    print(\"Correct answer\")\nexcept AssertionError:\n    print(\"Oops wrong answer\")",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 20:27:43.586",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "title": true,
+        "editorMode": "ace/mode/python"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1557570004388_587144551",
+      "id": "20190511-102004_111043460",
+      "dateCreated": "2019-05-11 10:20:04.000",
+      "dateStarted": "2019-11-25 20:27:43.611",
+      "dateFinished": "2019-11-25 20:27:43.664",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Opdracht: Maak een grafiek met de verdeling van de leeftijden",
+      "text": "%pyspark\nages \u003d \"your code goes here\"\n\nz.show(ages)",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 20:40:48.791",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "Age": "string",
+                      "count": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "Age",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "count",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1557577665912_860726285",
+      "id": "20190511-122745_276497483",
+      "dateCreated": "2019-05-11 12:27:45.000",
+      "dateStarted": "2019-11-25 20:39:18.581",
+      "dateFinished": "2019-11-25 20:39:19.154",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n### Data wegschrijven\nTot nu toe was de data allemaal in-memory, wellicht wil je het wegschrijven naar een disk bijvoorbeeld als Parquet, JSON of CSV\n\nIn de meest simpele vorm schrijf je de data weg als Parquet:\n```python\ndf.write.save(\"titanic_export.parquet\")\n```",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:08:11.383",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003eData wegschrijven\u003c/h3\u003e\n\u003cp\u003eTot nu toe was de data allemaal in-memory, wellicht wil je het wegschrijven naar een disk bijvoorbeeld als Parquet, JSON of CSV\u003c/p\u003e\n\u003cp\u003eIn de meest simpele vorm schrijf je de data weg als Parquet:\u003c/p\u003e\n\u003cpre\u003e\u003ccode class\u003d\"python\"\u003edf.write.save(\u0026quot;titanic_export.parquet\u0026quot;)\n\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1557570005198_1170329063",
+      "id": "20190511-102005_414505856",
+      "dateCreated": "2019-05-11 10:20:05.000",
+      "dateStarted": "2019-11-25 21:08:11.383",
+      "dateFinished": "2019-11-25 21:08:11.389",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n### Opdracht - Schrijf het DF weg als JSON, CSV en Parquet naar de map \u0027/zeppelin/data\u0027",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:08:19.321",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003eOpdracht - Schrijf het DF weg als JSON, CSV en Parquet naar de map \u0026lsquo;/zeppelin/data\u0026rsquo;\u003c/h3\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1574714969945_373232825",
+      "id": "20191125-204929_2109236781",
+      "dateCreated": "2019-11-25 20:49:29.945",
+      "dateStarted": "2019-11-25 21:08:19.321",
+      "dateFinished": "2019-11-25 21:08:19.327",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%pyspark\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 20:49:55.643",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1574714986969_1587748472",
+      "id": "20191125-204946_1766639594",
+      "dateCreated": "2019-11-25 20:49:46.969",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%pyspark\ndf.write.mode(\u0027overwrite\u0027).save(\"/zeppelin/data/titanic_export.parquet\")",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 20:55:36.671",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://38f1a360e020:4040/jobs/job?id\u003d141"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1574714998940_745556371",
+      "id": "20191125-204958_1645021261",
+      "dateCreated": "2019-11-25 20:49:58.940",
+      "dateStarted": "2019-11-25 20:55:36.696",
+      "dateFinished": "2019-11-25 20:55:36.953",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nAls we in de folder kijken zien we een parquet bestand, maar feitelijk is dit een folder met daarin alle partities. Kijk zelf maar met:\n```shell\n%sh\nls -la /zeppelin/data/\nls -la /zeppelin/data/titanic_export.parquet\n```\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:08:22.381",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eAls we in de folder kijken zien we een parquet bestand, maar feitelijk is dit een folder met daarin alle partities. Kijk zelf maar met:\u003c/p\u003e\n\u003cpre\u003e\u003ccode class\u003d\"shell\"\u003e%sh\nls -la /zeppelin/data/\nls -la /zeppelin/data/titanic_export.parquet\n\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1574715344273_-1733387581",
+      "id": "20191125-205544_923059333",
+      "dateCreated": "2019-11-25 20:55:44.273",
+      "dateStarted": "2019-11-25 21:08:22.381",
+      "dateFinished": "2019-11-25 21:08:22.393",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sh\nls -la /zeppelin/data/titanic_export.parquet",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 20:57:09.934",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "sh",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/sh"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1574714934635_1975651052",
+      "id": "20191125-204854_1642590198",
+      "dateCreated": "2019-11-25 20:48:54.635",
+      "dateStarted": "2019-11-25 20:57:09.959",
+      "dateFinished": "2019-11-25 20:57:09.977",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nIn dit geval is het maar 1 partitie, om te zien hoeveel partities er zijn:\n```python\ndf.rdd.getNumPartitions()\n```\n\nStel je wilt partitioneren dat doe je als volgt:\n```python\ndf.write.mode(\u0027overwrite\u0027).partitionBy(\u0027Survived\u0027).parquet(\u0027/zeppelin/data/titanic_survived\u0027)\n```\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:08:40.601",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eIn dit geval is het maar 1 partitie, om te zien hoeveel partities er zijn:\u003c/p\u003e\n\u003cpre\u003e\u003ccode class\u003d\"python\"\u003edf.rdd.getNumPartitions()\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eStel je wilt partitioneren dat doe je als volgt:\u003c/p\u003e\n\u003cpre\u003e\u003ccode class\u003d\"python\"\u003edf.write.mode(\u0026#39;overwrite\u0026#39;).partitionBy(\u0026#39;Survived\u0026#39;).parquet(\u0026#39;/zeppelin/data/titanic_survived\u0026#39;)\n\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1574715058420_-945286125",
+      "id": "20191125-205058_47717976",
+      "dateCreated": "2019-11-25 20:50:58.420",
+      "dateStarted": "2019-11-25 21:08:40.601",
+      "dateFinished": "2019-11-25 21:08:40.615",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%pyspark\ndf.write.mode(\u0027overwrite\u0027).partitionBy(\u0027Survived\u0027).parquet(\u0027/zeppelin/data/titanic_survived\u0027)",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:01:50.337",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://38f1a360e020:4040/jobs/job?id\u003d142"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1574715578334_-315003155",
+      "id": "20191125-205938_144757389",
+      "dateCreated": "2019-11-25 20:59:38.334",
+      "dateStarted": "2019-11-25 21:01:50.371",
+      "dateFinished": "2019-11-25 21:01:50.910",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sh\nls -la /zeppelin/data/titanic_survived",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:04:39.194",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "sh",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/sh"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1574715740580_1811191547",
+      "id": "20191125-210220_1462014566",
+      "dateCreated": "2019-11-25 21:02:20.580",
+      "dateStarted": "2019-11-25 21:04:39.222",
+      "dateFinished": "2019-11-25 21:04:39.243",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nVervolgens lezen we de data opnieuw in, hoeveel partities verwacht je?\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:08:43.751",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eVervolgens lezen we de data opnieuw in, hoeveel partities verwacht je?\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1574715695020_-970731971",
+      "id": "20191125-210135_1573856600",
+      "dateCreated": "2019-11-25 21:01:35.021",
+      "dateStarted": "2019-11-25 21:08:43.752",
+      "dateFinished": "2019-11-25 21:08:43.758",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%pyspark\ndf_survived \u003d spark.read.parquet(\u0027/zeppelin/data/titanic_survived\u0027)\ndf_survived.rdd.getNumPartitions()\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:05:58.762",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1574715908076_931267758",
+      "id": "20191125-210508_269624877",
+      "dateCreated": "2019-11-25 21:05:08.076",
+      "dateStarted": "2019-11-25 21:05:58.792",
+      "dateFinished": "2019-11-25 21:05:58.938",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%pyspark\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-25 21:05:58.763",
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1574715958762_1611133987",
+      "id": "20191125-210558_327780560",
+      "dateCreated": "2019-11-25 21:05:58.762",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "PySpark 101",
+  "id": "2ED36ADZD",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {
+    "md:shared_process": [],
+    "python:shared_process": [],
+    "sh:shared_process": [],
+    "spark:shared_process": []
+  },
+  "config": {
+    "isZeppelinNotebookCronEnable": false,
+    "looknfeel": "default",
+    "personalizedMode": "false"
+  },
+  "info": {}
+}

@@ -1,0 +1,11 @@
+version: '3'
+services:
+  zeppelin:
+    image: fdgds/spark-zeppelin
+    ports:
+      - "8080:8080"
+      - "4040:4040"
+    volumes:
+      - ./notebooks:/zeppelin/notebook
+      - ./data:/zeppelin/data
+    restart: always
